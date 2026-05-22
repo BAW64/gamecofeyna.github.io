@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт про видеоигры</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --card-bg: #f5f5f5;
+            --accent-color: #6a11cb;
+            --hover-color: #8e2de2;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --card-bg: #2d2d2d;
+            --accent-color: #8e2de2;
+            --hover-color: #6a11cb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--hover-color));
+            color: white;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .game-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .game-item:hover {
+            background: var(--hover-color);
+        }
+
+        .game-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .game-image {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .game-info h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .game-page {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .game-page img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .close-modal {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        footer {
+            background: var(--card-bg);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .slider {
+            overflow: hidden;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+        }
+
+        .slider-item {
+            display: inline-block;
+            width: 300px;
+            margin-right: 1rem;
+            vertical-align: top;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #20cc5b);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">Тёмная тема</button>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#about" class="nav-link" data-section="about">О нас</a></li>
+                <li><a href="#new-games" class="nav-link" data-section="new-games">Топ новых игр</a></li>
+                <li><a href="#old-games" class="nav-link" data-section="old-games">Топ старых игр</a></li>
+                <li><a href="#top-games" class="nav-link" data-section="top-games">Топ лучших игр</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Секция "О нас" -->
+        <section id="about" class="section active">
+            <h1>О нас</h1>
+            <div class="cards-grid">
+                <div class="card">
+                    <img src="часть1.jpg" alt="Изображение 1">
+                    <div class="card-content">
+                        <h3>Искусственный интеллект</h3>
+                        <p>Главным дизайнером сайта был ИИ, мы используем новейшие технгологии</p>
+                    </div>
+<div class="card">
+                    <img src="img.png" alt="Изображение 2">
+                    <div class="card-content">
+                        <h3>Энтузиазм</h3>
+                        <p>Сайт создан на чистом энтузиазме и без цели заработать</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="часть3.jpg" alt="Изображение 3">
+                    <div class="card-content">
+                        <h3>Обучение</h3>
+                        <p>Сайт создан в учебных целях</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="часть4.png" alt="Изображение 4">
+                    <div class="card-content">
+                        <h3>Фанатское мнение</h3>
+                        <p>Вся информация и рейтинги - фанатские оценки</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="img_93.png" alt="Изображение 5">
+                    <div class="card-content">
+                        <h3>Обновления</h3>
+                        <p>Постоянно добавляем новые игры в списки</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="часть6.jpg" alt="Изображение 6">
+                    <div class="card-content">
+                        <h3>Оформление</h3>
+                        <p>Дизайн сделан для максимально интуитивного, но приятного пользования</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция "Топ новых игр" -->
+        <section id="new-games" class="section">
+            <h1>Топ новых игр</h1>
+            <div class="game-list" id="newGamesList"></div>
+        </section>
+
+        <!-- Секция "Топ старых игр" -->
+        <section id="old-games" class="section">
+            <h1>Топ старых игр</h1>
+            <div class="game-list" id="oldGamesList"></div>
+        </section>
+
+        <!-- Секция "Топ лучших игр" -->
+        <section id="top-games" class="section">
+            <h1>Топ лучших игр</h1>
+            <div class="game-list" id="topGamesList"></div>
+        </section>
+
+        <!-- Страница игры -->
+        <section id="game-page" class="section">
+            <div class="game-page">
+                <img id="game-main-image" src="" alt="">
+                <h1 id="game-title"></h1>
+                <p id="game-description"></p>
+                <div class="gallery" id="game-gallery"></div>
+                <button onclick="goBack()">Назад к списку</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно обратной связи -->
+    <div class="modal" id="feedbackModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2>Обратная связь</h2>
+            <form id="feedbackForm">
+                <label for="name">Имя:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Сообщение:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>Автор сайта: Влад Шишкин Егорович</p>
+        <p>Email: dmitriip-11@mail.ru</p>
+        <p>Телеграм-канал: <a href="https://t.me/gamekofeyna">gamekofeyna</a></p>
+    </footer>
+
+    <script>
+        // Данные игр
+        const games = [
+            { id: 1, title: "Minecraft", description: "Окунитесь в мир кубической песочницы, которая уже успела стать культовой и иконой индустрии! Созидайте, разрушайте, веселителитесь с друзьями и просто выживайте в по истине легендарной игре.", releaseDate: 2011, rating: 9.9, top: true, images: ["img_2.png", "img_3.png", "img_4.png", "img_5.png", "img_6.png", "img_7.png"] },
+            { id: 2, title: "RUST", description: "Ржавчина (в переводе на русский) - игра для настоящих хардкорщиков с высоким порогом вхождения. Почувствуйте себя в роли выжившего на, имеющем заброшенную инфраструктуру, необитаемом острове... или, все же, обитаемом? Охотьтесь, стройте, изучайте технологии, исследуйте РТ, участвуйте в ивентах, обзаводитесь врагами и друзьями, ищите легендарный лут и постарайтесь не потерять все в гонке за ресурсами.", releaseDate: 2013, rating: 9.4, top: false, images: ["img_14.png", "img_15.png", "img_16.png", "img_17.png", "img_18.png", "img_19.png"] },
+            { id: 3, title: "SUBNAUTICA", description: "Вы - один из членов экипажа космического корабля, который потерпел крушение на неизвестной планете, почти всю поверхность которой покрывает вода. Начиная с маленькой капсулы и 'мелководья', постройте настоящую подводную лабораторию и исследуйте самые темные глубины океана.", releaseDate: 2018, rating: 9.8, top: true, images: ["img_8.png", "img_9.png", "img_10.png", "img_11.png", "img_12.png", "img_13.png"] },
+                { id: 4, title: "Escape from DUCKOV", description: "Многим игра покажется просто всратой пародией на Escape from Tarkov, хотя на своем релизе она собрала больший онлайн, чем оригинал. Возьмите на себя роль мультяшной утки, собирайте ресурсы и оружие, прокачивайте свою базу, покупайте улучшения и снаряжение. Очень залипательная инди-стрелялка, которая нравится игрокам больше, чем игра, с которой этот проект брал пример.", releaseDate: 2025, rating: 9.5, top: false, images: ["img_20.png", "img_21.png", "img_22.png", "img_23.png", "img_24.png", "img_25.png"] },
+            { id: 5, title: "BeamNG.drive", description: "Устали от казуальных гонок и нереалистичной физики авто? У 'Бимки' все то, что есть в реальной жизни: хорошая графика, реалистичная коробка передач ('акрадный режим' присутствует) и реалистичные повреждения. МНОГО реалистичных повреждений. Кроме того, у вас не получится красиво задрифтеть на повороте на любой машине, кинематографично залететь на трамплин или спокойно 'пошашковать', ведь любое неосторожное движение может привести к, например, заносу, оторванному колесу, или Вы просто превратите свою машину в лепешку из-за плохих тормозов. В игре вы можете создавать свои карты, а также поддерживается Steam Workshop, так что скучно вам точно не будет.", releaseDate: 2015, rating: 9.6, top: true, images: ["img_26.png", "img_27.png", "img_28.png", "img_29.png", "img_30.png", "img_31.png"] },
+            { id: 6, title: "Barotrauma", description: "Вам и другим игрокам предстоит стать одним из членов экипажа подводной лодки на водной планете, в целях ее изучения и выполнения квестов. Вы - всего лишь винтик в огромной машине, и вместе с коллегами вам придется отбиваться от морских чудовищ, чинить подлодку, вставать на сторону одной фракции, автоматически становясь врагом для другой, и покупать улучшения, чтобы следующая миссия имела шанс на успех.", releaseDate: 2023, rating: 8.9, top: false, images: ["img_32.png", "img_33.png", "img_34.png", "img_35.png", "img_36.png", "img_37.png"] },
+            { id: 7, title: "They Killed Your Cat", description: "Не самые добрые люди убили вашего котейку, и теперь вы отправляетесь мстить. На первый взгляд, враги с молотками не кажутся такими уж грозными, особенно учитывая то, что для их убийства требуется всего три пули (одна при хэдшоте), но ровно до того, как вы сделаете первый шаг. Буквально. Перезарядка поделена на дри действия, чтобы ходить, нужно управлять двумя ногами (на A и D), если не моргать - все перед глазами помутнеет, и про дыхание тоже лучше не забывать, чтобы не умереть от удушья. Игра довольно однотипная, особенно учитывая наличие всего трех видов оружия, но хардкорщики оценят.", releaseDate: 2026, rating: 8.6, top: true, images: ["img_38.png", "img_39.png", "img_40.png", "img_41.png", "img_42.png", "img_43.png"] },
+            { id: 8, title: "Hollow Knight: SILKSONG", description: "Настоящая пытка даже для хардкорщиков. 2d-платформер с приятной графикой, который игроки ждали еще со времен первой части. Хорнет - главная героиня-жук, в роли которой игроку придется сражаться с монстрами, побеждать боссов и проходить сложнейшие испытания, а также 'впитывать' интересный и продуманный сюжет вместе с пасхалками.", releaseDate: 2025, rating: 9.8, top: false, images: ["img_44.png", "img_45.png", "img_46.png", "img_47.png", "img_48.png", "img_49.png"] },
+            { id: 9, title: "Forza horizon 6", description: "Долгожданный гоночный симулятор с кинематографичной графикой, приятным управлением и, как говорят сами игроки, 'нереальной атмосферой Японии'. Высокая скорость, красивые пейзажи и спортивные тачки - именно то, что способно захватить дух любого мужчины.", releaseDate: 2026, rating: 9.7, top: true, images: ["img_50.png", "img_51.png", "img_52.png", "img_53.png", "img_54.png", "img_55.png"] },
+            { id: 10, title: "Hytale", description: "Игра от основателей крупного Minecraft-сервера, которая заставила поднапрячся самих Mojang. В первую очередь многие отмечают систему боевки: интереная, с уникальными механиками и разными видами оружия. Как же без строительства: подобно величайшей инди-игре, здесь предоставлена полная свобода, которую можно использовать как душе угодно, в том числе для строительства. В игре также присутствует сюжет, который и ведет нас убивать боссов, исследовать подземелья и данжи. Пока игра в раннем доступе, но мододелы уже создают невообразимое количество контента.", releaseDate: 2026, rating: 9.2, top: false, images: ["img_56.png", "img_57.png", "img_58.png", "img_59.png", "img_60.png", "img_61.png"] },
+            { id: 11, title: "R.E.P.O.", description: "Несмотря на свою принадлежность к жанру 'хорроры', ее смело можно назвать одной из самых смешных и необычных игр. Эта игра - духовный наследник Lethal Company, в которой вам и вашим друзьям придется вместе обчищать локации с дорогими предметами и страшными монстрами, а чтобы было удобнее скооперироваться - предоставлен голосовой чат. После завершения уровня, деньги, полученные с зачистки лвл-ов вы можете потратить на улучшения, например, овеличение здоровья, крылышки для полета или даже... пушки? После приобретения оружия (а в некоторых случаях - и ДО этого) вы сможете уничтожать монстров, из которых падают дорогие сферы, полностью покрывающие расходы на боеприпасы. Игра в свое время наделала много шума и до сих пор продолжает активно развиваться.", releaseDate: 2025, rating: 9.4, top: true, images: ["img_63.png", "img_64.png", "img_65.png", "img_66.png", "img_67.png", "img_68.png"] },
+            { id: 12, title: "The Long Dark", description: "Вы - один. Вокруг только холод, хищники и голод. С собой у вас только одежда и коробок спичек. Ваше местоположение - ныне неизвестный остров аляски, на котором жили люди, но по неизвестным причинам бросили его. Если от хищников удастся убежать, еду - собрать под деревом или найти в рыбацком домике, то холод - он везде, и побороть его даже с теплой одеждой не так-то просто, ведь любой источники огня или искорки нужно сперва найти, а ресурс это очень редкий и ценной, порой единственным выходом является круглосуточное поддержание огня. Удастся ли вам продержаться здесь в полном одиночестве еще, хотя бы, ночь?..", releaseDate: 2017, rating: 8.8, top: false, images: ["img_69.png", "img_71.png", "img_70.png", "img_72.png", "img_73.png", "img_74.png"] },
+            { id: 13, title: "Terraria", description: "Несмотря на 'два-дешность' и 'пиксельность' мира, здесь есть неограниченные возмажности: копайте шахты, исследуйте пещеры и данжи, сражайтесь с монстрами и ужасающими боссами, стройте красивые дома и возвдите целую деревню NPC-персонажей! Так и делать это все можно не в одиночку, а в пати до четырех человек. Уже несколько лет разработчики обещают 'Все, это - точно последнее обновление!', так что игра будет жить еще столько же, сколько ей сейчас лет.", releaseDate: 2011, rating: 9.4, top: true, images: ["img_75.png", "img_76.png", "img_77.png", "img_78.png", "img_79.png", "img_80.png"] },
+            { id: 14, title: "STRAY", description: "Вы - котик, который хочет найти дорогу домой и сбежать из этого довольно футуристичного, но бедного кибер-города. Игра довольно короткая с простеньким сюжетом, но трогает до глубины души; является именно той игрой, в которую хочется вернуться даже спустя несколько лет и снова получить приятные эмоции от прохождения.", releaseDate: 2022, rating: 9.1, top: false, images: ["img_81.png", "img_82.png", "img_83.png", "img_84.png", "img_85.png", "img_86.png"] },
+            { id: 15, title: "RimWorld", description: "Вам предстоит взять на себя роль повелителя-божества, которыйф будет выстраивать своим колонистам распорядок дня, приоритет работ, а также вы будете доводить своих работяг до нервного срыва. У каждой 'пешки' есть свои черты характьера, особенности здоровья, болезни, навыки, предрасположенности и интересы, каждой из них нужны отдых и свободное время, а плохое настроение (на которое влияет как красота помещения и рацион, так и близкие) способно привести к затворничеству, после чего пешка не будет выполнять работу и перестанет подчиняться приказам, или даже подрыву склада с боеприпасами. На планете, где первобытные племена уживаются (а ингогда и воюют) с продвинутыми космческими цивилизациями, вашим пешкам придется построить идеальную базу, чтобы защищаться от врагов, добывать пищу и исследовать технологии, чтобы, в конечном счете, покинуть эту планету (хотя никто не запрещает сделать ее своим домом и продолжать развиваться).", releaseDate: 2018, rating: 9.1, top: true, images: ["img_87.png", "img_88.png", "img_89.png", "img_90.png", "img_91.png", "img_92.png"] }
+        ];
+
+        // Переключение секций
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        function showSection(sectionId) {
+            // Скрываем все секции
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Показываем нужную секцию
+            document.getElementById(sectionId).classList.add('active');
+
+            // Обновляем список игр для соответствующих секций
+            if (sectionId === 'new-games') {
+                renderGames(getNewGames(), 'newGamesList');
+            } else if (sectionId === 'old-games') {
+                renderGames(getOldGames(), 'oldGamesList');
+            } else if (sectionId === 'top-games') {
+                renderGames(getTopGames(), 'topGamesList');
+            }
+        }
+
+        // Получение новых игр (последние 5 лет)
+        function getNewGames() {
+            const currentYear = new Date().getFullYear();
+            return games.filter(game => game.releaseDate >= currentYear - 5);
+        }
+
+        // Получение старых игр (старше 5 лет)
+        function getOldGames() {
+            const currentYear = new Date().getFullYear();
+            return games.filter(game => game.releaseDate < currentYear - 5);
+        }
+
+        // Получение топ игр (по рейтингу)
+        function getTopGames() {
+            return [...games].sort((a, b) => b.rating - a.rating);
+        }
+
+        // Отрисовка списка игр
+        function renderGames(gamesList, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            gamesList.forEach((game, index) => {
+                const gameItem = document.createElement('div');
+                gameItem.className = 'game-item';
+                gameItem.innerHTML = `
+                    <div class="game-number">${index + 1}</div>
+                    <img src="${game.images[0]}" alt="${game.title}" class="game-image">
+                    <div class="game-info">
+                        <h3>${game.title}</h3>
+                        <p>${game.description}</p>
+                    </div>
+                `;
+                gameItem.addEventListener('click', () => showGamePage(game.id));
+                container.appendChild(gameItem);
+            });
+        }
+
+        // Показ страницы игры
+        function showGamePage(gameId) {
+            const game = games.find(g => g.id === gameId);
+            if (!game) return;
+
+            showSection('game-page');
+
+            document.getElementById('game-main-image').src = game.images[0];
+            document.getElementById('game-title').textContent = game.title;
+            document.getElementById('game-description').textContent = game.description;
+
+            const gallery = document.getElementById('game-gallery');
+            gallery.innerHTML = '';
+
+            game.images.forEach(imgSrc => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = game.title;
+                gallery.appendChild(img);
+            });
+        }
+
+        // Возврат к списку игр
+        function goBack() {
+            window.history.back();
+        }
+
+        // Переключение темы
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = 'Светлая тема';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeToggle.textContent = 'Тёмная тема';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.textContent = 'Светлая тема';
+            }
+        });
+
+        // Модальное окно обратной связи
+        function openModal() {
+            document.getElementById('feedbackModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('feedbackModal').classList.remove('active');
+        }
+
+        // Обработка формы обратной связи
+        document.getElementById('feedbackForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+
+            // email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                alert('Пожалуйста, введите корректный email адрес');
+                return;
+            }
+
+            console.log('Данные формы:', formData);
+            alert('Сообщение отправлено!');
+            closeModal();
+            document.getElementById('feedbackForm').reset();
+        });
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            // Добавляем обработчик для открытия модального окна (можно добавить кнопку в интерфейс)
+            // Для примера добавим кнопку в футер:
+            const footer = document.querySelector('footer');
+            const feedbackBtn = document.createElement('button');
+            feedbackBtn.textContent = 'Обратная связь';
+            feedbackBtn.style.marginTop = '1rem';
+            feedbackBtn.addEventListener('click', openModal);
+            footer.appendChild(feedbackBtn);
+
+            // Изначально показываем секцию "О нас"
+            showSection('about');
+        });
+    </script>
+</body>
+</html>
